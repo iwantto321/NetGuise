@@ -1,0 +1,5 @@
+Class,Samples,Avg Pkt Size (B),Avg IAT (s),Avg Duration (s)
+amazon,4525,784.51,0.1032,10.03
+youtube,5751,800.50,0.0899,8.82
+twitch,1066,737.47,0.1284,12.61
+netflix,3298,767.48,0.1283,11.79

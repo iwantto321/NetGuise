@@ -2,3 +2,7 @@ numpy
 pandas
 scapy
 tqdm
+torch>=2.0.0
+scikit-learn
+joblib
+matplotlib
