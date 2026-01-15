@@ -1,184 +1,217 @@
-NetGuise: Early-Stage Protocol-Compliant Traffic Morphing
+# NetGuise: Early-Stage Protocol-Compliant Traffic Morphing
 
-⚠️ ANONYMITY WARNING: This repository contains artifacts for a double-blind submission to ACM CCS 2026. Please maintain author anonymity during the review process. Do not distribute or de-anonymize the authors.
+⚠️ **ANONYMITY WARNING**
 
-This repository contains the official PyTorch implementation of NetGuise, a generative framework designed to evade early-stage ML-based censorship while strictly enforcing protocol validity.
+This repository contains artifacts for a **double-blind submission to ACM CCS 2026**.  
+Please maintain **author anonymity** during the review process.  
+Do **not** distribute, attribute, or de-anonymize the authors.
 
-📖 Overview
+---
 
-NetGuise addresses the "Feasibility Gap" in censorship evasion by generating packet-level, replayable traffic that preserves transport-layer semantics.
+## 📖 Overview
 
-Paper Reference: NetGuise: Early-Stage Protocol-Compliant Traffic Morphing against Black-Box Censors
+This repository contains the **official PyTorch implementation** of **NetGuise**,  
+a generative framework designed to evade **early-stage ML-based censorship**  
+while **strictly enforcing transport-layer protocol validity**.
 
-Core Contributions:
+NetGuise addresses the *feasibility gap* in censorship evasion by generating  
+**packet-level, replayable traffic** that preserves TCP/TLS semantics.
 
-Evasion: Achieves >92% evasion rate against SOTA classifiers (UniNet, FastFlow) [Paper §6.2].
+**Paper Reference**
 
-Validity: Enforces 100% TCP/TLS compliance via amortized optimization [Paper §4.3].
+> *NetGuise: Early-Stage Protocol-Compliant Traffic Morphing against Black-Box Censors*
 
-Real-Time: Operates with <15ms inference latency, suitable for early-stage handshake morphing.
+---
 
-📂 Repository Structure
+## ✨ Core Contributions
 
-The codebase is organized into 5 sequential steps, directly mapping to the experimental pipeline described in the paper:
+- **Evasion**  
+  Achieves **>92% evasion rate** against state-of-the-art classifiers  
+  (UniNet, FastFlow) — Paper §6.2
 
+- **Validity**  
+  Enforces **100% TCP/TLS compliance** via amortized optimization — Paper §4.3
+
+- **Real-Time**  
+  Less than **15 ms inference latency**, suitable for early-stage handshake morphing
+
+---
+
+## 📂 Repository Structure
+
+```text
 .
-├── README.md                   # This file
-├── requirements.txt            # Python dependencies
-├── input.pcap                  # Sample raw traffic (VideoPF subset) for quick verification
-├── Step1_data_processing.py    # Feature extraction from PCAP (Paper §5.1)
-├── Step2_Train_censor.py       # Training Baseline Censors & Surrogate (Paper §6.1)
-├── Step3_train_morpher.py      # Training NetGuise Generator (Paper §4)
-├── Step4_inference.py          # Generating Adversarial Traces (Paper §6.2)
-├── Step5_validation.py         # Validity & Replay Verification (Paper §6.4)
-├── data/                       # Dataset directory
-│   ├── raw_samples/            # Place raw PCAPs here (e.g., input.pcap)
-│   └── processed/              # Extracted feature matrices (.npy)
-└── models/                     # Saved checkpoints
-    ├── censors/                # Pre-trained classifiers (UniNet, FastFlow, etc.)
-    └── morpher/                # Trained NetGuise generator
+├── README.md
+├── requirements.txt
+├── input.pcap
+├── Step1_data_processing.py
+├── Step2_Train_censor.py
+├── Step3_train_morpher.py
+├── Step4_inference.py
+├── Step5_validation.py
+├── data/
+│   ├── raw_samples/
+│   └── processed/
+└── models/
+    ├── censors/
+    └── morpher/
+```
 
+---
 
-💾 Datasets (Detail & Availability)
+## 💾 Datasets (Detail & Availability)
 
-This study utilizes three heterogeneous datasets to evaluate robustness across different network conditions (Cellular, VPN, Residential).
+We evaluate NetGuise across **three heterogeneous datasets**  
+(Cellular, VPN, Residential) to test robustness.
 
-1. Dataset Access
+### 1. Dataset Access
 
-Due to the extreme size (>500GB) of the full raw PCAP repositories, we provide preprocessed feature matrices (.npy) which are sufficient to reproduce all training and evasion results reported in the paper.
+Due to the extreme size of raw PCAP repositories (>500GB), we provide  
+**preprocessed feature matrices** sufficient to reproduce all results reported in the paper.
 
-🔗 Download Preprocessed Datasets (Review Link):
+**Anonymous Review Link (Zenodo):**
 
+```
 [INSERT YOUR ANONYMOUS ZENODO LINK HERE]
+```
 
-Contents: UTMobileNet.zip, VANT.zip, and VideoPF.zip (Features X.npy & Labels y.npy).
+**Contents:**
 
-🔗 Original Sources (Reference Only):
+- UTMobileNet.zip  
+- VANT.zip  
+- VideoPF.zip  
 
-UTMobileNet-2021: IEEE Dataport Link
+Each archive includes `X.npy` (features) and `y.npy` (labels).
 
-VANT-2024: Public Repository Link
+**Original Sources (Reference Only):**
 
-2. Dataset Composition (Paper Table 6)
+- UTMobileNet-2021 — IEEE Dataport  
+- VANT-2024 — Public Repository  
 
-Detailed class distribution for the datasets used in our evaluation:
+---
 
-A. UTMobileNet-2021 (Cellular/High-Jitter)
+### 2. Dataset Composition (Paper Table 6)
 
-Description: Captures real-world mobile traffic with significant jitter and packet loss.
+#### A. UTMobileNet-2021 (Cellular / High Jitter)
+
 | Application | Count | Application | Count |
-| :--- | :--- | :--- | :--- |
+|------------|------:|------------|------:|
 | GoogleMaps | 3,184 | Pinterest | 1,272 |
 | Netflix | 3,021 | Instagram | 1,259 |
 | Reddit | 2,271 | Facebook | 1,238 |
 | Spotify | 971 | Twitter | 682 |
-| Total Flows | ~15,000 | Metric | Targeted ESR |
+| **Total Flows** | **~15,000** | | |
 
-B. VANT-2024 (Encrypted VPN/IoT)
+---
 
-Description: Encrypted VPN tunnel traffic representing IoT and generic secure channels.
+#### B. VANT-2024 (Encrypted VPN / IoT)
+
 | Category | Count | Category | Count |
-| :--- | :--- | :--- | :--- |
+|---------|------:|---------|------:|
 | File Transfer | 10,430 | Chat | 1,101 |
 | C2 (Command) | 9,599 | VoIP | 617 |
 | Streaming | 1,264 | YouTube | 1,031 |
-| Total Flows | ~23,000 | | |
+| **Total Flows** | **~23,000** | | |
 
-C. VideoPF-2025 (Adaptive Streaming)
+---
 
-Description: Custom dataset capturing adaptive-bitrate (ABR) video streaming under realistic shaping.
+#### C. VideoPF-2025 (Adaptive Streaming)
+
 | Application | Count | Application | Count |
-| :--- | :--- | :--- | :--- |
+|------------|------:|------------|------:|
 | YouTube | 5,751 | Amazon | 4,525 |
 | Netflix | 3,298 | Twitch | 1,066 |
 
-🛠️ Setup & Requirements
+---
+
+## 🛠️ Setup & Requirements
 
 We recommend using a fresh Conda environment to ensure reproducibility.
 
-1. Environment Setup
+### 1. Environment Setup
 
+```bash
 conda create -n netguise python=3.9
 conda activate netguise
 
-# Install python dependencies (PyTorch, Scapy, Pandas, etc.)
 pip install -r requirements.txt
+```
 
+---
 
-2. System Dependencies (Required for Step 5)
+### 2. System Dependencies (Required for Step 5)
 
-To run the validity verification script (Step5_validation.py), you need tcpreplay and tshark (Wireshark CLI) installed:
-
-# Ubuntu/Debian
+```bash
+# Ubuntu / Debian
 sudo apt-get install tcpreplay tshark
 
-# MacOS
+# macOS
 brew install tcpreplay wireshark
+```
 
+---
 
-🚀 Reproduction Pipeline
+## 🚀 Reproduction Pipeline
 
-We provide a sample input.pcap in the root directory to allow immediate testing of the pipeline.
+A sample `input.pcap` is provided in the repository root for quick verification.
 
-Step 1: Feature Extraction (Paper §5.1)
+### Step 1: Feature Extraction (Paper §5.1)
 
-Extracts flow features (Packet Size, Direction, IAT) from raw PCAP traces.
+```bash
+python Step1_data_processing.py     --input_dir data/raw_samples     --save_dir data/processed     --workers 4
+```
 
-python Step1_data_processing.py \
-    --input_dir data/raw_samples \
-    --save_dir data/processed \
-    --workers 4
+Ensure `input.pcap` is placed in `data/raw_samples/`.
 
+---
 
-Note: Ensure input.pcap is placed in data/raw_samples/ before running.
+### Step 2: Censor & Surrogate Training (Paper §6.1)
 
-Step 2: Censor & Surrogate Training (Paper §6.1)
+```bash
+python Step2_Train_censor.py     --data_dir data/processed     --epochs 20     --save_dir models/censors
+```
 
-Trains the baseline censors (Grad-BP, CNN, LSTM, UniNet) and the surrogate model used by the attacker.
+Outputs trained classifiers (e.g., `UniNet.pth`, `FastFlow.pth`).
 
-python Step2_Train_censor.py \
-    --data_dir data/processed \
-    --epochs 20 \
-    --save_dir models/censors
+---
 
+### Step 3: Training NetGuise (Paper §4.3)
 
-Output: Saves trained models (e.g., UniNet.pth, FastFlow.pth) to models/censors/.
+The generator minimizes the composite loss:
 
-Step 3: Training NetGuise (Paper §4.3)
+```math
+L = L_adv + λ_feas L_feas
+```
 
-Trains the amortized generator using the differentiable surrogate. This script optimizes the composite loss: $\mathcal{L} = \mathcal{L}_{adv} + \lambda_{feas}\mathcal{L}_{feas}$.
+```bash
+python Step3_train_morpher.py     --surrogate_path models/censors/UniNet.pth     --save_dir models/morpher     --epochs 20
+```
 
-python Step3_train_morpher.py \
-    --surrogate_path models/censors/UniNet.pth \
-    --save_dir models/morpher \
-    --epochs 20
+---
 
+### Step 4: Inference & Morphing (Paper §6.2)
 
-Output: Saves netguise_morpher_optimized.pth. You can change --surrogate_path to test transferability (Exp-5).
+```bash
+python Step4_inference.py     --input data/raw_samples/input.pcap     --output results/morphed.pcap     --model_path models/morpher/netguise_morpher_optimized.pth
+```
 
-Step 4: Inference & Morphing (Paper §6.2)
+Produces a physically realizable morphed PCAP.
 
-Generates adversarial traces by applying the learned morphing policy to new flows.
+---
 
-python Step4_inference.py \
-    --input data/raw_samples/input.pcap \
-    --output results/morphed.pcap \
-    --model_path models/morpher/netguise_morpher_optimized.pth
+### Step 5: Validity Verification (Paper §6.4)
 
+```bash
+python Step5_validation.py     --real data/raw_samples/input.pcap     --morphed results/morphed.pcap
+```
 
-Output: A physically realizable .pcap file saved to results/morphed.pcap.
+✔ Verifies TCP three-way handshakes  
+✔ Checks checksum correctness  
+✔ Outputs LaTeX tables for Paper Tables 9 and 10  
 
-Step 5: Validity Verification (Paper §6.4)
+---
 
-[Highlight] Automatically verifies protocol compliance and generates LaTeX tables matching the paper.
+## 📜 License
 
-python Step5_validation.py \
-    --real data/raw_samples/input.pcap \
-    --morphed results/morphed.pcap
-
-
-Output: Verifies TCP 3-way handshakes, checks for checksum errors, and prints LaTeX code for Table 9 and Table 10 to the console.
-
-📜 License
-
-This project is licensed
+This project is licensed under the MIT License.  
+See the `LICENSE` file for details.
