@@ -8,7 +8,7 @@ Do **not** distribute, attribute, or de-anonymize the authors.
 
 ---
 
-## 📖 Overview
+##  Overview
 
 This repository contains the **official PyTorch implementation** of **NetGuise**,  
 a generative framework designed to evade **early-stage ML-based censorship**  
@@ -23,7 +23,7 @@ NetGuise addresses the *feasibility gap* in censorship evasion by generating
 
 ---
 
-## ✨ Core Contributions
+## Core Contributions
 
 - **Evasion**  
   Achieves **>92% evasion rate** against state-of-the-art classifiers  
@@ -37,7 +37,7 @@ NetGuise addresses the *feasibility gap* in censorship evasion by generating
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```text
 .
@@ -59,7 +59,7 @@ NetGuise addresses the *feasibility gap* in censorship evasion by generating
 
 ---
 
-## 💾 Datasets (Detail & Availability)
+## Datasets (Detail & Availability)
 
 We evaluate NetGuise across **three heterogeneous datasets**  
 (Cellular, VPN, Residential) to test robustness.
@@ -73,18 +73,41 @@ Due to the extreme size of raw PCAP repositories (>19GB), we provide
 
 **Contents:**
 
-- UTMobileNet.zip  
-- VANT.zip  
 - VideoPF.zip  
 
 Each archive includes `X.npy` (features) and `y.npy` (labels).
 
-**Original Sources (Reference Only):**
+## UTMobileNetTraffic2021
 
-- UTMobileNet-2021 — IEEE Dataport  
-- VANT-2024 — Public Repository  
+The UTMobileNetTraffic2021 dataset is a labeled mobile network traffic dataset collected under real-world cellular conditions.
+
+**Dataset Access:**  
+The dataset can be downloaded from the official repository:  
+https://utexas.box.com/s/okrimcsz1mn9ec4j667kbb00d9gt16ii
+
+**Reference:**  
+Y. Heng, V. Chandrasekhar, and J. G. Andrews,  
+“UTMobileNetTraffic2021: A Labeled Public Network Traffic Dataset,”  
+*IEEE Networking Letters*, 2021.
+
+**DOI:**  
+10.1109/LNET.2021.3098455
 
 ---
+
+## VANT-2024 (VPN / Non-VPN Traffic Dataset)
+
+The VANT-2024 dataset contains encrypted VPN and non-VPN traffic traces designed for network application classification and analysis under realistic deployment scenarios.
+
+**Dataset Access:**  
+The dataset is publicly available at:  
+https://www.ll.mit.edu/rd/datasets/vpnnonvpn-network-application-traffic-dataset-vnat
+
+**Reference:**  
+S. Jorgensen, J. Holodnak, J. Dempsey, K. de Souza, A. Raghunath, V. Rivet, et al.,  
+“Extensible Machine Learning for Encrypted Network Traffic Application Labeling via Uncertainty Quantification,”  
+*IEEE Transactions on Artificial Intelligence*, vol. 5, no. 1, pp. 420–433, 2023.
+
 
 ### 2. Dataset Composition (Paper Table 6)
 
@@ -120,7 +143,7 @@ Each archive includes `X.npy` (features) and `y.npy` (labels).
 
 ---
 
-## 🛠️ Setup & Requirements
+## Setup & Requirements
 
 We recommend using a fresh Conda environment to ensure reproducibility.
 
@@ -147,7 +170,7 @@ brew install tcpreplay wireshark
 
 ---
 
-## 🚀 Reproduction Pipeline
+## Reproduction Pipeline
 
 A sample `input.pcap` is provided in the repository root for quick verification.
 
@@ -207,7 +230,7 @@ python Step5_validation.py     --real data/raw_samples/input.pcap     --morphed 
 
 ---
 
-## 📜 License
+## License
 
 This project is licensed under the MIT License.  
 See the `LICENSE` file for details.
