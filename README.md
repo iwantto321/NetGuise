@@ -53,7 +53,7 @@ NetGuise addresses the *feasibility gap* in censorship evasion by generating
 │   ├── raw_samples/
 │   └── processed/
 └── models/
-    ├── censors/
+    ├── censor/
     └── morpher/
 ```
 
