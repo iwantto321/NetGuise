@@ -66,13 +66,9 @@ We evaluate NetGuise across **three heterogeneous datasets**
 
 ### 1. Dataset Access
 
-Due to the extreme size of raw PCAP repositories (>500GB), we provide  
+Due to the extreme size of raw PCAP repositories (>19GB), we provide  
 **preprocessed feature matrices** sufficient to reproduce all results reported in the paper.
 
-**Anonymous Review Link (Zenodo):**
-
-```
-[INSERT YOUR ANONYMOUS ZENODO LINK HERE]
 ```
 
 **Contents:**
