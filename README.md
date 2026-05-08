@@ -1,4 +1,4 @@
-# NetGuise: Early-Stage Protocol-Compliant Traffic Morphing
+# NETGUISE: Protocol-Compliant Adversarial Traffic Generation for Early-Stage Classifier Evasion
 
 ⚠️ **ANONYMITY WARNING**
 
@@ -19,21 +19,16 @@ NetGuise addresses the *feasibility gap* in censorship evasion by generating
 
 **Paper Reference**
 
-> *NetGuise: Early-Stage Protocol-Compliant Traffic Morphing against Black-Box Censors*
+> *NETGUISE: Protocol-Compliant Adversarial Traffic Generation for Early-Stage Classifier Evasion*
 
 ---
 
 ## Core Contributions
 
-- **Evasion**  
-  Achieves **>92% evasion rate** against state-of-the-art classifiers  
-  (UniNet, FastFlow) — Paper §6.2
-
-- **Validity**  
-  Enforces **100% TCP/TLS compliance** via amortized optimization — Paper §4.3
-
-- **Real-Time**  
-  Less than **15 ms inference latency**, suitable for early-stage handshake morphing
+   1) NETGUISE, to the best of our knowledge, is the first adversarial morphing framework designed specifically for 2early-stage MTCs, with protocol validity enforced by architectural design rather than per-flow solvers (§IV-C).
+   2) A targeted evasion formulation that enables impersonation of a specific allowed application through crossattention and direction-aware target selection (§IV-C1).
+   3) A five-round adaptive evaluation against the early-stage MTCs, with a per-pair structural analysis identifying three traffic properties (packet-size gap, temporal gap, direction-sequence compatibility) that dominate evasion feasibility (§VI-B);
+   4) Multi-layer validation across protocol semantics, TLS fingerprints, and live SDN replay, confirming that morphed f lows are realizable network traffic (§VI-D).
 
 ---
 
@@ -55,6 +50,13 @@ NetGuise addresses the *feasibility gap* in censorship evasion by generating
 └── models/
     ├── censor/
     └── morpher/
+└── TestBed-live-SDN/
+    └── SDN_proxy/
+        ├──controller.py
+        ├──echo_client.py
+        ├──echo_server.py
+        ├──proxy.py
+        └──topo_p2p.py
 ```
 
 ---
