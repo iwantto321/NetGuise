@@ -2,7 +2,7 @@
 
 ⚠️ **ANONYMITY WARNING**
 
-This repository contains artifacts for a **double-blind submission to ACM CCS 2026**.  
+This repository contains artifacts for a **double-blind submission to NDSS 2027**.  
 Please maintain **author anonymity** during the review process.  
 Do **not** distribute, attribute, or de-anonymize the authors.
 
