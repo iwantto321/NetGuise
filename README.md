@@ -11,11 +11,11 @@ Do **not** distribute, attribute, or de-anonymize the authors.
 ##  Overview
 
 This repository contains the **official PyTorch implementation** of **NetGuise**,  
-a generative framework designed to evade **early-stage ML-based censorship**  
+a generative framework designed to evade **early-stage ML-based network traffic classifiers (MTCs)**  
 while **strictly enforcing transport-layer protocol validity**.
 
-NetGuise addresses the *feasibility gap* in censorship evasion by generating  
-**packet-level, replayable traffic** that preserves TCP/TLS semantics.
+NetGuise addresses the *feasibility gap* in MTC evasion by generating  
+**black-box, targeted evasion, replayable traffic** that preserves TCP/TLS semantics.
 
 **Paper Reference**
 
