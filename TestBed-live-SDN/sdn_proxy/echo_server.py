@@ -1,32 +1,31 @@
 #!/usr/bin/env python3
 import socket
 
-HOST = ''    # listen on all interfaces at localhost
-PORT = 8000  # service port
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as srv:
-    srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    srv.bind((HOST, PORT))
-    srv.listen()
-    print(f"[dn] Echo server listening on port {PORT}")
-    while True:
-        conn, addr = srv.accept()
-        print(f"[dn] Connected by {addr}")
-        with conn:
-            try:
-                while True:
-                    data = conn.recv(1024)
-                    if not data:
-                        # Client has closed the write end of the connection
-                        break
-                    print(f"[dn] Received: {data!r}, echoing back")
-                    conn.sendall(data)
-            finally:
-                # Initiate TCP FIN to ensure a clean 4-way termination
-                try:
-                    conn.shutdown(socket.SHUT_RDWR)
-                except OSError:
-                    # If the socket is already half-closed, ignore the error
-                    pass
-        # conn.close() is automatically called here by the context manager, after "with conn"
-        print(f"[dn] Connection with {addr} closed")
+HOST = "0.0.0.0"
+PORT = 8000
+
+
+def serve_connection(connection):
+    with connection:
+        while True:
+            data = connection.recv(4096)
+            if not data:
+                return
+            connection.sendall(data)
+
+
+def main():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server.bind((HOST, PORT))
+        server.listen(16)
+        print(f"echo server listening on {HOST}:{PORT}")
+        while True:
+            connection, address = server.accept()
+            print(f"accepted connection from {address}")
+            serve_connection(connection)
+
+
+if __name__ == "__main__":
+    main()

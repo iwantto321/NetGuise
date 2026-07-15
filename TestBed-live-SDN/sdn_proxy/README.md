@@ -1,49 +1,43 @@
-# Transparent SDN Proxy with Mininet and Ryu
+# Transparent SDN proxy
 
-A simple SDN-based transparent proxy architecture using [Mininet](https://github.com/mininet/mininet) and [Ryu](https://osrg.github.io/ryu/), enabling interception, redirection, and transparent forwarding of TCP connections — similar to a userspace man-in-the-middle system.
+The topology connects a client, transparent proxy, and echo server through an
+OpenFlow 1.3 switch. The Ryu controller installs DNAT, SNAT, ARP, and forwarding
+rules so traffic addressed to the server can traverse the proxy.
 
-## 🧠 Overview
+```text
+server 10.0.0.1:8000
+          |
+         s1
+        /  \
+proxy       client
+10.0.0.254  10.0.0.2
+:9000
+```
 
-This project demonstrates how to transparently redirect and forward TCP traffic (e.g., HTTP) from a client to a proxy, and then forward the proxy’s processed response back to the client — while pretending the traffic is between the client and the original server.
+## Requirements
 
-All redirection is handled at the SDN switch using OpenFlow 1.3 rules set by a custom Ryu controller.
-
-## 📡 Topology
-                        (10.0.0.1:8000)
-                            Server/dn 
-                               | eth1
-                             +----+
-                             | s1 | Gateway (OpenFlow Switch)
-                             +----+
-                    eth2    /      \     eth3
-                       Proxy      Client/h1
-            (10.0.0.254:9000)     (10.0.0.2)
-### 🧪 Roles
-
-- **`h1`**: Client that initiates TCP connection to `10.0.0.1:8000`
-- **`proxy`**: Transparent proxy, receives traffic redirected from h1 and forwards to real server
-- **`dn`**: Real server running echo service on port `8000`
-- **`s1`**: SDN switch controlled by Ryu, performs DNAT/SNAT/ARP proxying
-
-
-## ⚙️ Requirements
-
-- Python 3.x
+- Linux
+- Python 3
 - Mininet
-- Ryu SDN Controller
-- `ebtables` (optional for L2-level interception)
+- Open vSwitch
+- Ryu
 
-## 🔧📎📄 Execution
-```bash
-(terminal-1) ryu-manager controller.py
-```
+## Run
 
-```bash
-(terminal-2) sudo python3 topo_p2p.py  # This will give enter the mininet CLI
-mininet> xterm h1  # This will enter client CLI
-```
+Start the controller:
 
 ```bash
-[h1] python3 echo_client.py
+cd TestBed-live-SDN/sdn_proxy
+ryu-manager controller.py
 ```
 
+Start the topology in another terminal:
+
+```bash
+sudo python3 topo_p2p.py
+```
+
+From the Mininet CLI, open the relevant hosts and start the echo server, proxy,
+and client. The proxy intentionally forwards bytes unchanged. A tunnel-layer
+shaper can consume actions from `netguise.online.CausalMorpherSession`, but it
+must define paired encapsulation and decapsulation before padding is enabled.
