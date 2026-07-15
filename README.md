@@ -1,238 +1,179 @@
-# NETGUISE: Protocol-Compliant Adversarial Traffic Generation for Early-Stage Classifier Evasion
+# NetGuise
 
-⚠️ **ANONYMITY WARNING**
+NetGuise is a target-conditioned traffic morphing framework for evaluating
+early-stage encrypted traffic classifiers. It generates packet-level padding
+and non-negative delay actions while preserving packet direction, order, and
+count under explicit MTU, bandwidth, and latency constraints.
 
-This repository contains artifacts for a **double-blind submission to SIGMETRICS 2027**.  
-Please maintain **author anonymity** during the review process.  
-Do **not** distribute, attribute, or de-anonymize the authors.
+This repository contains research code accompanying the NetGuise manuscript.
 
----
+## What is implemented
 
-##  Overview
+- A 30-packet early-stage representation with packet size, direction, and
+  inter-arrival time.
+- Morphability-aware target-reference selection within a fixed target class.
+- A shared source/target Transformer encoder and target-conditioned
+  cross-attention decoder.
+- Sigmoid action projection into the remaining padding and delay budgets.
+- Full-window inference and a masked-causal online mode. Online mode hides all
+  future packet features, commits only the current action, and never revises a
+  committed action.
+- Adapted FastFlow and UniNet classifier baselines for the early-flow feature
+  space used here.
+- Constraint validation for generated feature plans.
 
-This repository contains the **official PyTorch implementation** of **NetGuise**,  
-a generative framework designed to evade **early-stage ML-based network traffic classifiers (MTCs)**  
-while **strictly enforcing transport-layer protocol validity**.
+The FastFlow and UniNet models are paper-informed adaptations, not copies of
+the authors' complete upstream implementations. FastFlow uses packet and
+time-interval LSTM branches with confidence-based early stopping. UniNet uses
+packet tokens, a flow-summary token, segment embeddings, learnable positional
+embeddings, and a lightweight pre-normalized Transformer encoder.
 
-NetGuise addresses the *feasibility gap* in MTC evasion by generating  
-**black-box, targeted evasion, replayable traffic** that preserves TCP/TLS semantics.
-
-**Paper Reference**
-
-> *NETGUISE: Adversarial Traffic Generation for Early-Stage Classifier Evasion*
-
----
-
-## Core Contributions
-
-   1) NETGUISE, to the best of our knowledge, is the first adversarial morphing framework designed specifically for 2early-stage MTCs, with protocol validity enforced by architectural design rather than per-flow solvers (§IV-C).
-   2) A targeted evasion formulation that enables impersonation of a specific allowed application through crossattention and direction-aware target selection (§IV-C1).
-   3) A five-round adaptive evaluation against the early-stage MTCs, with a per-pair structural analysis identifying three traffic properties (packet-size gap, temporal gap, direction-sequence compatibility) that dominate evasion feasibility (§VI-B);
-   4) Multi-layer validation across protocol semantics, TLS fingerprints, and live SDN replay, confirming that morphed f lows are realizable network traffic (§VI-D).
-
----
-
-## Repository Structure
+## Repository layout
 
 ```text
-.
-├── README.md
-├── requirements.txt
-├── input.pcap
-├── Step1_data_processing.py
-├── Step2_Train_censor.py
-├── Step3_train_morpher.py
-├── Step4_inference.py
-├── Step5_validation.py
-├── data/
-│   ├── raw_samples/
-│   └── processed/
-└── models/
-    ├── censor/
-    └── morpher/
-└── TestBed-live-SDN/
-    └── SDN_proxy/
-        ├──controller.py
-        ├──echo_client.py
-        ├──echo_server.py
-        ├──proxy.py
-        └──topo_p2p.py
+netguise/                    Core package
+  cli/                       Command-line workflows
+  models/                    Morpher and classifier definitions
+scripts/                     Stable artifact entry points
+configs/default.json         Paper-aligned default parameters
+tests/                       Unit and smoke tests
+data/                        Example PCAP and processed features
+models/                      Checkpoints and model notes
+TestBed-live-SDN/            Controlled network testbed
+ARTIFACT.md                  Reproduction and verification guide
 ```
 
----
+The `Step1_...py` through `Step5_...py` files remain as small compatibility
+entry points. New work should use `scripts/` or the installed console commands.
 
-## Datasets (Detail & Availability)
+## Setup
 
-We evaluate NetGuise across **three heterogeneous datasets**  
-(Cellular, VPN, Residential) to test robustness.
-
-### 1. Dataset Access
-
-Due to the extreme size of raw PCAP repositories (>19GB), we provide  
-**preprocessed feature matrices** sufficient to reproduce all results reported in the paper.
-
-
-
-**Contents:**
-
-- VideoPF.zip  
-
-Each archive includes `X.npy` (features) and `y.npy` (labels).
-
-## UTMobileNetTraffic2021
-
-The UTMobileNetTraffic2021 dataset is a labeled mobile network traffic dataset collected under real-world cellular conditions.
-
-**Dataset Access:**  
-The dataset can be downloaded from the official repository:  
-https://utexas.box.com/s/okrimcsz1mn9ec4j667kbb00d9gt16ii
-
-**Reference:**  
-Y. Heng, V. Chandrasekhar, and J. G. Andrews,  
-“UTMobileNetTraffic2021: A Labeled Public Network Traffic Dataset,”  
-*IEEE Networking Letters*, 2021.
-
-**DOI:**  
-10.1109/LNET.2021.3098455
-
----
-
-## VANT-2024 (VPN / Non-VPN Traffic Dataset)
-
-The VANT-2024 dataset contains encrypted VPN and non-VPN traffic traces designed for network application classification and analysis under realistic deployment scenarios.
-
-**Dataset Access:**  
-The dataset is publicly available at:  
-https://www.ll.mit.edu/rd/datasets/vpnnonvpn-network-application-traffic-dataset-vnat
-
-**Reference:**  
-S. Jorgensen, J. Holodnak, J. Dempsey, K. de Souza, A. Raghunath, V. Rivet, et al.,  
-“Extensible Machine Learning for Encrypted Network Traffic Application Labeling via Uncertainty Quantification,”  
-*IEEE Transactions on Artificial Intelligence*, vol. 5, no. 1, pp. 420–433, 2023.
-
-
-### 2. Dataset Composition (Paper Table 6)
-
-#### A. UTMobileNet-2021 (Cellular / High Jitter)
-
-| Application | Count | Application | Count |
-|------------|------:|------------|------:|
-| GoogleMaps | 3,184 | Pinterest | 1,272 |
-| Netflix | 3,021 | Instagram | 1,259 |
-| Reddit | 2,271 | Facebook | 1,238 |
-| Spotify | 971 | Twitter | 682 |
-| **Total Flows** | **~15,000** | | |
-
----
-
-#### B. VANT-2024 (Encrypted VPN / IoT)
-
-| Category | Count | Category | Count |
-|---------|------:|---------|------:|
-| File Transfer | 10,430 | Chat | 1,101 |
-| C2 (Command) | 9,599 | VoIP | 617 |
-| Streaming | 1,264 | YouTube | 1,031 |
-| **Total Flows** | **~23,000** | | |
-
----
-
-#### C. VideoPF-2025 (Adaptive Streaming)
-
-| Application | Count | Application | Count |
-|------------|------:|------------|------:|
-| YouTube | 5,751 | Amazon | 4,525 |
-| Netflix | 3,298 | Twitch | 1,066 |
-
----
-
-## Setup & Requirements
-
-We recommend using a fresh Conda environment to ensure reproducibility.
-
-### 1. Environment Setup
+Python 3.10 or newer is required.
 
 ```bash
-conda create -n netguise python=3.9
-conda activate netguise
-
-pip install -r requirements.txt
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m pip install -e .
 ```
 
----
-
-### 2. System Dependencies (Required for Step 5)
+Run the test suite after installation:
 
 ```bash
-# Ubuntu / Debian
-sudo apt-get install tcpreplay tshark
-
-# macOS
-brew install tcpreplay wireshark
+pytest
 ```
 
----
+## Reproduction workflow
 
-## Reproduction Pipeline
+The included processed dataset contains 100 packets per flow for compatibility
+with earlier experiments. Training commands use the first 30 packets by
+default.
 
-A sample `input.pcap` is provided in the repository root for quick verification.
+### 1. Optional PCAP preprocessing
 
-### Step 1: Feature Extraction (Paper §5.1)
+Raw PCAPs are arranged as one directory per class:
 
-```bash
-python Step1_data_processing.py     --input_dir data/raw_samples     --save_dir data/processed     --workers 4
-```
-
-Ensure `input.pcap` is placed in `data/raw_samples/`.
-
----
-
-### Step 2: Censor & Surrogate Training (Paper §6.1)
-
-```bash
-python Step2_Train_censor.py     --data_dir data/processed     --epochs 20     --save_dir models/censors
-```
-
-Outputs trained classifiers (e.g., `UniNet.pth`, `FastFlow.pth`).
-
----
-
-### Step 3: Training NetGuise (Paper §4.3)
-
-The generator minimizes the composite loss:
-
-```math
-L = L_adv + λ_feas L_feas
+```text
+dataset/
+  amazon/*.pcap
+  netflix/*.pcap
+  ...
 ```
 
 ```bash
-python Step3_train_morpher.py     --surrogate_path models/censors/UniNet.pth     --save_dir models/morpher     --epochs 20
+python scripts/preprocess.py \
+  --data-root /path/to/dataset \
+  --output-dir data/processed_dataset \
+  --max-packets 30 \
+  --workers 4
 ```
 
----
+### 2. Train censors and local surrogates
 
-### Step 4: Inference & Morphing (Paper §6.2)
+The split is class-stratified: 50% defender, 30% attacker, and 20% test.
 
 ```bash
-python Step4_inference.py     --input data/raw_samples/input.pcap     --output results/morphed.pcap     --model_path models/morpher/netguise_morpher_optimized.pth
+python scripts/train_classifiers.py \
+  --data-dir data/processed_dataset \
+  --output-dir models/censor \
+  --max-packets 30 \
+  --epochs 20
 ```
 
-Produces a physically realizable morphed PCAP.
+### 3. Train NetGuise
 
----
-
-### Step 5: Validity Verification (Paper §6.4)
+Full-window training:
 
 ```bash
-python Step5_validation.py     --real data/raw_samples/input.pcap     --morphed results/morphed.pcap
+python scripts/train_morpher.py \
+  --surrogate models/censor/Attacker_UniNet.pt \
+  --interface full \
+  --epochs 20
 ```
 
-✔ Verifies TCP three-way handshakes  
-✔ Checks checksum correctness  
-✔ Outputs LaTeX tables for Paper Tables 9 and 10  
+Masked-causal training is available with `--interface online`. `mixed` samples
+between full-window and causal batches.
 
----
+### 4. Generate a plan
+
+Full-window mode:
+
+```bash
+python scripts/morph.py \
+  --input data/raw_data/input.pcap \
+  --target-class youtube \
+  --mode full \
+  --plan results/full-window.json
+```
+
+Masked-causal online mode:
+
+```bash
+python scripts/morph.py \
+  --input data/raw_data/input.pcap \
+  --target-class youtube \
+  --mode online \
+  --plan results/online.json \
+  --output-pcap results/online-timing.pcap
+```
+
+The optional PCAP output materializes non-negative delays. Padding remains in
+the JSON plan because inserting bytes into an arbitrary TCP payload would not
+preserve application semantics. A deployment endpoint must apply padding in
+the tunnel encapsulation layer assumed by the threat model.
+
+### 5. Validate constraints
+
+```bash
+python scripts/validate.py --plan results/online.json
+```
+
+The validator checks packet count, direction, additive-only actions, MTU, and
+the configured bandwidth and latency budgets. It exits with a non-zero status
+when any check fails.
+
+## Online API
+
+`netguise.online.CausalMorpherSession` exposes the packet-at-a-time interface.
+Each call to `observe()` accepts one `[size, direction, IAT]` vector and returns
+the padding and delay for that packet. The session contains no deployed-censor
+query path.
+
+## Checkpoints
+
+The revised models use self-describing `.pt` checkpoints containing the model
+type, architecture configuration, class names, normalization statistics, and
+weights. Existing `.pth` files are retained as legacy outputs and are not
+silently loaded into the revised architectures. See `models/README.md`.
+
+## Scope and safety
+
+The implementation is intended for controlled robustness evaluation on traffic
+owned by the experimenter or used with explicit authorization. The online mode
+implements the manuscript's masked-causal interface; it is not presented as a
+general-purpose censorship bypass deployment.
 
 ## License
 
-This project is licensed under the MIT License.  
-See the `LICENSE` file for details.
+MIT. See `LICENSE`.
