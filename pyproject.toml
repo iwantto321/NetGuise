@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netguise"
+version = "0.2.0"
+description = "Constraint-aware traffic morphing for early-stage classifier evaluation"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+dependencies = [
+  "numpy>=1.24,<3",
+  "scapy>=2.5,<3",
+  "torch>=2.1,<3",
+  "scikit-learn>=1.3,<2",
+  "joblib>=1.3,<2",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<9"]
+
+[project.scripts]
+netguise-preprocess = "netguise.cli.preprocess:main"
+netguise-train-classifiers = "netguise.cli.train_classifiers:main"
+netguise-train-morpher = "netguise.cli.train_morpher:main"
+netguise-morph = "netguise.cli.morph:main"
+netguise-validate = "netguise.cli.validate:main"
+
+[tool.setuptools.packages.find]
+include = ["netguise*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
