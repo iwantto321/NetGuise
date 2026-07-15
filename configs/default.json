@@ -1,0 +1,23 @@
+{
+  "traffic": {
+    "max_packets": 30,
+    "feature_dim": 3,
+    "mtu": 1500.0,
+    "bandwidth_ratio": 0.3,
+    "latency_ratio": 0.5
+  },
+  "morpher": {
+    "d_model": 64,
+    "feedforward_dim": 128,
+    "encoder_layers": 2,
+    "attention_heads": 4,
+    "dropout": 0.1
+  },
+  "training": {
+    "batch_size": 128,
+    "epochs": 20,
+    "learning_rate": 0.0005,
+    "weight_decay": 0.00001,
+    "seed": 42
+  }
+}
