@@ -2,7 +2,7 @@
 
 ⚠️ **ANONYMITY WARNING**
 
-This repository contains artifacts for a **double-blind submission to NDSS 2027**.  
+This repository contains artifacts for a **double-blind submission to SIGMETRICS 2027**.  
 Please maintain **author anonymity** during the review process.  
 Do **not** distribute, attribute, or de-anonymize the authors.
 
@@ -19,7 +19,7 @@ NetGuise addresses the *feasibility gap* in MTC evasion by generating
 
 **Paper Reference**
 
-> *NETGUISE: Protocol-Compliant Adversarial Traffic Generation for Early-Stage Classifier Evasion*
+> *NETGUISE: Adversarial Traffic Generation for Early-Stage Classifier Evasion*
 
 ---
 
